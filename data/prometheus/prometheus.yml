@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: "todo-monitor"
+
+scrape_configs:
+  - job_name: "todo-app"
+    static_configs:
+      - targets: ["localhost:8001"]
