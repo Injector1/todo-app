@@ -6,6 +6,10 @@ import { PrismaModule } from 'src/orm/prisma/prisma.module';
 import { TokenModule } from '../token/token.module';
 import { PasswordService } from './password.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import {
+  makeCounterProvider,
+  PrometheusModule,
+} from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
@@ -14,7 +18,19 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     forwardRef(() => UserModule),
     TokenModule,
   ],
-  providers: [AuthService, PasswordService, JwtStrategy],
+  providers: [
+    AuthService,
+    PasswordService,
+    JwtStrategy,
+    makeCounterProvider({
+      name: 'users_signed_up',
+      help: 'how_many_users_signed_up',
+    }),
+    makeCounterProvider({
+      name: 'users_logged_in',
+      help: 'how_many_users_logged_in',
+    }),
+  ],
   controllers: [AuthController],
   exports: [PasswordService],
 })

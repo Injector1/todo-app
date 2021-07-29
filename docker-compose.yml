@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+    networks:
+      - backend
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "8002:8002"
+    command: yarn start:dev
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_ACCESS_TOKEN_EXPIRES_IN=${JWT_ACCESS_TOKEN_EXPIRES_IN}
+      - JWT_REFRESH_TOKEN_EXPIRES_IN=${JWT_REFRESH_TOKEN_EXPIRES_IN}
+      - SALT_OR_ROUNDS=${SALT_OR_ROUNDS}
+      - JWT_SECRET=${JWT_SECRET}
+
+  prometheus:
+    image: prom/prometheus:latest
+    networks:
+      - monitoring
+      - backend
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/prometheus
+      - ./data/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - '9090:9090'
+
+  grafana:
+    image: grafana/grafana
+    networks:
+      - monitoring
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=${GF_USERS_ALLOW_SIGN_UP}
+      - GF_SERVER_DOMAIN=${GF_SERVER_DOMAIN}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./data/grafana/provisioning:/etc/grafana/provisioning
+      - ./data/grafana/config.ini:/etc/grafana/config.ini
+      - ./data/grafana/dashboards:/var/lib/grafana/dashboards
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    ports:
+      - '3000:3000'
+
+networks:
+  monitoring: {}
+  backend: {}
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}

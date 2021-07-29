@@ -13,4 +13,9 @@ export class UserResolver {
   getUser(@Args('userId') userId: string) {
     return this.userService.findUserById(userId);
   }
+
+  @Query(() => String)
+  testQuery() {
+    return 'abc';
+  }
 }

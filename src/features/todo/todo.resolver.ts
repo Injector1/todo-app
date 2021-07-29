@@ -3,6 +3,8 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { Todo } from './todo.model';
 import { TodoService } from './todo.service';
+import { UserEntity } from '../user/user.decorator';
+import { User } from '@prisma/client';
 
 @Resolver(() => Todo)
 export class TodoResolver {
@@ -10,18 +12,18 @@ export class TodoResolver {
 
   @UseGuards(GqlAuthGuard)
   @Query(() => [Todo])
-  todos() {
-    return this.todoService.getTodos();
+  todos(@UserEntity() user: User) {
+    return this.todoService.getUserTodos(user.id);
   }
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Todo)
   createTodo(
+    @UserEntity() user: User,
     @Args('title', { type: () => String }) title: string,
     @Args('isDone', { type: () => Boolean }) isDone: boolean,
-    @Args('userId', { type: () => String }) userId: string,
   ) {
-    return this.todoService.createTodo(title, isDone, userId);
+    return this.todoService.createTodo(title, isDone, user.id);
   }
 
   @UseGuards(GqlAuthGuard)
