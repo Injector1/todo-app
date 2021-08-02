@@ -50,8 +50,6 @@ export class TodoService {
   }
 
   async deleteTodos() {
-    return await (
-      await this.prismaService.todo.deleteMany({})
-    ).count;
+    return (await this.prismaService.todo.deleteMany({})).count;
   }
 }

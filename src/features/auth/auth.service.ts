@@ -24,9 +24,8 @@ export class AuthService {
   }
 
   async signIn(user: Prisma.UserCreateInput, refreshToken?: string) {
-    const existingUser = await this.userService.findUserByUsername(
-      user.username,
-    );
+    const { username } = user;
+    const existingUser = await this.userService.findUser({ username });
 
     if (!existingUser) {
       throw new BadRequestException('No user in Database');
@@ -40,6 +39,7 @@ export class AuthService {
       user.password,
       existingUser.password,
     );
+
     if (passwordMatch) {
       return await this.createTokens(existingUser);
     }
@@ -86,7 +86,6 @@ export class AuthService {
           async (token) =>
             await this.tokenService.getCookieWithAccessToken(token),
         );
-
       const refreshToken = await this.tokenService
         .generateToken(tokenPayload, {
           expiresIn: refreshTokenExpiresIn,

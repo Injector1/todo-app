@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from './user.model';
 import { Todo } from '../todo/todo.model';
 import { PrismaService } from 'src/orm/prisma/prisma.service';
@@ -11,32 +11,30 @@ export class UserService {
     private prismaService: PrismaService,
     private passwordService: PasswordService,
   ) {}
-
-  async findUserById(id: string) {
-    return await this.prismaService.user.findFirst({
-      where: { id },
-      include: { todos: true },
-    });
+  async findUser(by: { id?: string; username?: string }) {
+    return await this.prismaService.user.findUnique({ where: by });
   }
 
-  async findUserByUsername(username: string) {
+  async getUserProfile(by: { id?: string; username?: string }) {
     return await this.prismaService.user.findUnique({
-      where: {
-        username,
-      },
+      where: by,
+      select: { id: true, username: true, password: false, todos: true },
     });
   }
 
   async createUser(user: Prisma.UserCreateInput): Promise<User> {
-    const hashedPassword = await this.passwordService.hashPassword(
-      user.password,
-    );
-    return await this.prismaService.user.create({
-      data: {
-        username: user.username,
-        password: hashedPassword,
-      },
-    });
+    if (!this.findUser({ username: user.username })) {
+      const hashedPassword = await this.passwordService.hashPassword(
+        user.password,
+      );
+      return await this.prismaService.user.create({
+        data: {
+          username: user.username,
+          password: hashedPassword,
+        },
+      });
+    }
+    throw new BadRequestException('User with this credentials already exists');
   }
 
   async getUserTodos(id: string) {
