@@ -30,19 +30,16 @@ export class AuthService {
     if (!existingUser) {
       throw new BadRequestException('No user in Database');
     }
-    this.loggedInCounter.inc(1);
-
-    if (refreshToken && existingUser) {
-      return await this.createTokens(existingUser, refreshToken);
-    }
     const passwordMatch = await this.passwordService.comparePasswords(
       user.password,
       existingUser.password,
     );
 
-    if (passwordMatch) {
-      return await this.createTokens(existingUser);
-    }
+    if (passwordMatch)
+      return await this.createTokens(
+        existingUser,
+        refreshToken ? refreshToken : undefined,
+      );
     throw new BadRequestException('Invalid credentials');
   }
 

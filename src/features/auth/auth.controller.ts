@@ -31,7 +31,7 @@ export class AuthController {
     );
     response.header('Set-Cookie', [cookies.accessToken, cookies.refreshToken]);
     delete user?.password;
-    return response.send(user).status(200);
+    return response.status(200).send(user);
   }
 
   @Post('/refresh')
