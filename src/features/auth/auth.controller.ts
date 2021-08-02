@@ -25,6 +25,8 @@ export class AuthController {
   @Post('/login')
   async login(@Req() request: Request, @Res() response: Response) {
     const user = request.body;
+    console.log(user);
+
     const cookies = await this.authService.signIn(
       user,
       request.cookies?.Refresh,

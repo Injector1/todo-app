@@ -23,7 +23,8 @@ export class UserService {
   }
 
   async createUser(user: Prisma.UserCreateInput): Promise<User> {
-    if (!this.findUser({ username: user.username })) {
+    const existingUser = await this.findUser({ username: user.username });
+    if (!existingUser) {
       const hashedPassword = await this.passwordService.hashPassword(
         user.password,
       );
