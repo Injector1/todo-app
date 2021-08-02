@@ -14,7 +14,6 @@ export class AuthController {
   @Post('/signUp')
   async signUp(@Req() request: Request, @Res() response: Response) {
     const user = request.body;
-    console.log(user.password);
 
     const cookies = await this.authService.signUp(user);
 
@@ -31,7 +30,8 @@ export class AuthController {
       request.cookies?.Refresh,
     );
     response.header('Set-Cookie', [cookies.accessToken, cookies.refreshToken]);
-    return response.send(user);
+    delete user?.password;
+    return response.send(user).status(200);
   }
 
   @Post('/refresh')
