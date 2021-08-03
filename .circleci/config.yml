@@ -12,7 +12,7 @@ jobs:
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
       - run:
-          command: yarn install --immutable
+          command: yarn install --immutable --ignore-engines
       - save_cache:
           name: Save Yarn Package Cache
           key: yarn-packages-{{ checksum "yarn.lock" }}
