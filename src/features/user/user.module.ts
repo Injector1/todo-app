@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { UserResolver } from './user.resolver';
 import { PrismaModule } from 'src/orm/prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [PrismaModule, forwardRef(() => AuthModule)],

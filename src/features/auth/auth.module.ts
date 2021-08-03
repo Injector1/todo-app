@@ -10,6 +10,7 @@ import {
   makeCounterProvider,
   PrometheusModule,
 } from '@willsoto/nestjs-prometheus';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
