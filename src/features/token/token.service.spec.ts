@@ -11,7 +11,10 @@ describe('TokenService', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [PrismaModule, JwtModule.register({ secret: 'secret' })],
+      imports: [
+        PrismaModule,
+        JwtModule.register({ secret: process.env.JWT_SECRET }),
+      ],
       providers: [
         TokenService,
         {

@@ -22,7 +22,7 @@ describe('AuthService', () => {
         PrismaModule,
         UserModule,
         TokenModule,
-        JwtModule.register({ secret: 'secret' }),
+        JwtModule.register({ secret: process.env.JWT_SECRET }),
       ],
       providers: [
         PasswordService,
@@ -44,6 +44,8 @@ describe('AuthService', () => {
           provide: JwtService,
           useValue: {
             sign: jest.fn().mockReturnValue('token'),
+            verify: jest.fn(),
+            decode: jest.fn(),
           },
         },
         {
