@@ -7,9 +7,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
-import { get } from 'http';
 import { MailService } from '../mail/mail.service';
 import { TokenService } from '../token/token.service';
 import { AuthService } from './auth.service';
@@ -20,7 +18,6 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private tokenService: TokenService,
-    private mailService: MailService,
   ) {}
 
   @Post('/signUp')
