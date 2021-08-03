@@ -20,6 +20,19 @@ jobs:
             - .yarn/cache
             - .yarn/unplugged
       - run:
+          name: Configuring environment
+          command: |
+            echo "DATABASE_URL=${DATABASE_URL}" >> .env
+            echo "JWT_ACCESS_TOKEN_EXPIRES_IN=${JWT_ACCESS_TOKEN_EXPIRES_IN}" >> .env
+            echo "JWT_REFRESH_TOKEN_EXPIRES_IN=${JWT_REFRESH_TOKEN_EXPIRES_IN}" >> .env
+            echo "SALT_OR_ROUNDS=${SALT_OR_ROUNDS}" >> .env
+            echo "JWT_SECRET=${JWT_SECRET}" >> .env
+            echo "GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}" >> .env
+            echo "GF_USERS_ALLOW_SIGN_UP=${GF_USERS_ALLOW_SIGN_UP}" >> .env
+            echo "GF_SERVER_DOMAIN=${GF_SERVER_DOMAIN}" >> .env
+
+      - run:
+          name: Running tests
           command: yarn test
 workflows:
   build-and-test:
