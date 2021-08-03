@@ -22,7 +22,7 @@ describe('AuthService', () => {
         PrismaModule,
         UserModule,
         TokenModule,
-        JwtModule.register({ secret: process.env.JWT_SECRET }),
+        JwtModule.register({ secret: 'secret' }),
       ],
       providers: [
         PasswordService,
