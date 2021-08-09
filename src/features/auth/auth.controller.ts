@@ -4,68 +4,40 @@ import {
   Get,
   Post,
   Req,
+  Request as NestRequest,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { MailService } from '../mail/mail.service';
-import { TokenService } from '../token/token.service';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AuthenticatedGuard } from './guards/authenticated.guard';
+import { LoginGuard } from './guards/login.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    private tokenService: TokenService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
-  @Post('/signUp')
-  async signUp(@Req() request: Request, @Res() response: Response) {
-    const user = request.body;
-
-    const cookies = await this.authService.signUp(user);
-
-    response.header('Set-Cookie', [cookies.accessToken, cookies.refreshToken]);
-
-    return response.send(user);
+  @UseGuards(LoginGuard)
+  @Post('/signin')
+  async signIn(@Res() res: Response) {
+    res.send('home');
   }
 
-  @Post('/login')
-  async login(@Req() request: Request, @Res() response: Response) {
-    const user = request.body;
-    console.log(user);
+  @Post('/signup')
+  async signUp(@Req() request: Request) {
+    const createdUser = await this.authService.signUp(request.body);
 
-    const cookies = await this.authService.signIn(
-      user,
-      request.cookies?.Refresh,
-    );
-    response.header('Set-Cookie', [cookies.accessToken, cookies.refreshToken]);
-    delete user?.password;
-    return response.status(200).send(user);
+    if (createdUser) {
+      delete createdUser.password;
+      return createdUser;
+    }
   }
+  @UseGuards(AuthenticatedGuard)
+  @Get('/home')
+  getHome(@NestRequest() req) {
+    if (!req.session.time) req.session.time = 123;
+    console.log(req);
 
-  @Post('/refresh')
-  async refresh(@Req() request: Request, @Res() response: Response) {
-    const refreshToken = request.cookies?.Refresh;
-
-    const data = await this.tokenService.verifyRefreshToken(refreshToken);
-
-    const cookies = await this.authService.createTokens(data, refreshToken);
-
-    response.header('Set-Cookie', [cookies.accessToken, cookies.refreshToken]);
-
-    return response.send(data);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  getHello(@Req() request: Request) {
-    console.log(request.cookies);
-  }
-
-  @Get('/cookies')
-  getCookies(@Req() request: Request) {
-    console.log(request.cookies);
+    return { user: req.user };
   }
 }
