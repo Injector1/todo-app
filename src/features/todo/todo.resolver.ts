@@ -8,12 +8,15 @@ import {
   ID,
   InputType,
   Field,
+  ResolveField,
+  Parent,
 } from '@nestjs/graphql';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { Todo } from './todo.model';
 import { TodoService } from './todo.service';
 import { UserEntity } from '../user/user.decorator';
 import { User } from '@prisma/client';
+import { UserService } from '../user/user.service';
 
 @InputType()
 class TodoInput extends Todo {
@@ -29,7 +32,10 @@ class TodoInput extends Todo {
 
 @Resolver(() => Todo)
 export class TodoResolver {
-  constructor(private readonly todoService: TodoService) {}
+  constructor(
+    private readonly todoService: TodoService,
+    private userService: UserService,
+  ) {}
 
   @UseGuards(GqlAuthGuard)
   @Query(() => [Todo])
@@ -64,5 +70,10 @@ export class TodoResolver {
   @Mutation(() => Int)
   deleteTodos() {
     return this.todoService.deleteTodos();
+  }
+
+  @ResolveField()
+  async creator(@Parent() todo: Todo) {
+    return this.userService.findUser({ id: todo.userId });
   }
 }

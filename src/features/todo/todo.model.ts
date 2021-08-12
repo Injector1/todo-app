@@ -1,5 +1,6 @@
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
 import { Todo as PrismaTodo } from '@prisma/client';
+import { User } from '../user/user.model';
 
 @ObjectType()
 export class Todo implements PrismaTodo {
@@ -12,6 +13,8 @@ export class Todo implements PrismaTodo {
   @Field(() => Boolean)
   isDone: boolean;
 
-  @Field(() => ID)
+  @Field(() => User)
+  creator?: User;
+
   userId: string;
 }
