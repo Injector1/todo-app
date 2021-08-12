@@ -22,16 +22,8 @@ model Todo {
   User   User?   @relation(fields: [userId], references: [id])
 }
 
-model AccessToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-}
-
-model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+model Session {
+  sid    String   @id
+  sess   String
+  expire DateTime
 }

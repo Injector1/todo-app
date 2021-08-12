@@ -40,4 +40,9 @@ export class AuthController {
 
     return { user: req.user };
   }
+
+  @Get('/r')
+  getReq(@NestRequest() req) {
+    console.log(req);
+  }
 }

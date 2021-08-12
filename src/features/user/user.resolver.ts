@@ -1,6 +1,5 @@
-import { Body, UseGuards } from '@nestjs/common';
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
-import { id } from 'date-fns/locale';
+import { UseGuards } from '@nestjs/common';
+import { Resolver, Query, Args, ID } from '@nestjs/graphql';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { User } from './user.model';
 import { UserService } from './user.service';
@@ -15,8 +14,8 @@ export class UserResolver {
     return this.userService.getUserProfile({ id });
   }
 
-  @Query(() => String)
-  testQuery() {
-    return 'abc';
+  @Query(() => User)
+  testQuery(@Args('userId') id: string) {
+    return this.userService.getUserProfile({ id });
   }
 }
