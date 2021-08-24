@@ -10,6 +10,7 @@ import {
   Field,
   ResolveField,
   Parent,
+  PartialType,
 } from '@nestjs/graphql';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { Todo } from './todo.model';
@@ -19,14 +20,20 @@ import { User } from '@prisma/client';
 import { UserService } from '../user/user.service';
 
 @InputType()
-class TodoInput extends Todo {
-  @Field(() => ID, { nullable: true })
-  id: string;
-
-  @Field(() => String, { defaultValue: '' })
+class TodoCreateInput extends Todo {
+  @Field(() => String)
   title: string;
 
   @Field(() => Boolean, { defaultValue: false })
+  isDone: boolean;
+}
+
+@InputType()
+class TodoUpdateInput extends PartialType(TodoCreateInput) {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => Boolean, { nullable: true })
   isDone: boolean;
 }
 
@@ -47,7 +54,7 @@ export class TodoResolver {
   @Mutation(() => Todo)
   createTodo(
     @UserEntity() user: User,
-    @Args('todoInput') todoInput: TodoInput,
+    @Args('todoInput') todoInput: TodoCreateInput,
   ) {
     return this.todoService.createTodo(
       todoInput.title,
@@ -58,7 +65,7 @@ export class TodoResolver {
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Todo)
-  updateTodo(@Args('updateTodoInput') updateTodoInput: TodoInput) {
+  updateTodo(@Args('updateTodoInput') updateTodoInput: TodoUpdateInput) {
     return this.todoService.changeTodo(
       updateTodoInput.id,
       updateTodoInput.title,
